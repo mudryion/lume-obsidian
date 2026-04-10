@@ -136,7 +136,7 @@ class LumeSettingTab extends PluginSettingTab {
 // ==================== Main Plugin ====================
 
 export default class LumePlugin extends Plugin {
-    settings: LumeSettings;
+    settings!: LumeSettings;
     errorMarks: Array<{
         line: number;
         word: string;
@@ -349,26 +349,53 @@ export default class LumePlugin extends Plugin {
 
     async callAI(prompt: string, isJson: boolean = false): Promise<string | null> {
         try {
+            let userUrl = (this.settings.proxyUrl || "").trim();
+            if (userUrl && !userUrl.startsWith("http")) {
+                userUrl = "https://" + userUrl;
+            }
+
+            const useProxy = userUrl && userUrl.includes("vercel.app");
+            const url = useProxy ? userUrl : "https://api.groq.com/openai/v1/chat/completions";
+            
+            const sanitizedKey = (this.settings.apiKey || "").trim();
+            const headers: Record<string, string> = { 
+                "Content-Type": "application/json",
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Origin": "https://obsidian.md",
+                "Referer": "https://obsidian.md/"
+            };
+            
+            if (!useProxy) {
+                headers["Authorization"] = `Bearer ${sanitizedKey}`;
+            } else {
+                headers["Authorization"] = `Lume ${sanitizedKey}`;
+            }
+
             const response = await requestUrl({
-                url: "https://api.groq.com/openai/v1/chat/completions",
+                url: url,
                 method: "POST",
-                headers: { 
-                    "Authorization": `Bearer ${this.settings.apiKey}`, 
-                    "Content-Type": "application/json" 
-                },
+                headers: headers,
                 body: JSON.stringify({
                     model: this.settings.model,
                     messages: [
-                        { role: "system", content: isJson ? "You are a helpful English coach. Return JSON ONLY." : "You are an Elite English coach." }, 
+                        { role: "system", content: isJson ? "JSON ONLY. English coach." : "Elite English coach." }, 
                         { role: "user", content: prompt }
                     ],
                     temperature: 0.1
                 })
             });
+
+            if (response.status !== 200) {
+                const errorBody = response.json || {};
+                const msg = errorBody.error?.message || errorBody.error || "Unknown error";
+                new Notice(`Lume Error (${response.status}): ${msg}`);
+                return null;
+            }
+
             return response.json.choices[0].message.content;
         } catch (error) { 
-            console.error("Lume AI Call Error:", error);
-            new Notice("Check your API connection or key.");
+            console.error("Lume SDK Error:", error);
+            new Notice(`Lume Network Error: ${(error as any).message || "Check your URL/Internet"}`);
             return null; 
         }
     }
