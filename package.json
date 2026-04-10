@@ -2,6 +2,9 @@
   "name": "lume-obsidian",
   "version": "1.0.0",
   "description": "Premium AI-powered English practice assistant.",
+  "engines": {
+    "node": "20.x"
+  },
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.js",
