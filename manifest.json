@@ -1,0 +1,10 @@
+{
+  "id": "lume-obsidian",
+  "name": "Lume",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Premium AI-powered English practice and translation assistant with a credit-based system.",
+  "author": "Antigravity",
+  "authorUrl": "https://lume.ai",
+  "isDesktopOnly": false
+}
