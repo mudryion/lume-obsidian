@@ -5,7 +5,8 @@
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.js",
-    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.js production"
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.js production",
+    "vercel-build": "echo 'Skipping plugin build for Vercel deployment'"
   },
   "keywords": [
     "obsidian",
@@ -17,6 +18,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.11.0",
+    "@vercel/node": "^3.0.0",
     "builtin-modules": "^3.3.0",
     "esbuild": "^0.19.11",
     "obsidian": "latest",
