@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node esbuild.config.js",
     "build": "tsc -noEmit -skipLibCheck && node esbuild.config.js production",
-    "vercel-build": "echo 'Skipping plugin build for Vercel deployment'"
+    "vercel-build": "mkdir -p public && echo 'Lume API is running' > public/index.html"
   },
   "keywords": [
     "obsidian",
